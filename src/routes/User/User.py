@@ -74,6 +74,7 @@ def create_user():
     try:
         status = UserStatus.query.filter_by(name="INACTIVO").first()
         status_activo = UserStatus.query.filter_by(name="ACTIVO").first()
+        role = Role.query.filter_by(name="USUARIO").first()
         
         if status == None:
             return jsonify({'message': 'No es posible consultar usuario porque no hay datos en la base de datos'}), 500
@@ -83,16 +84,14 @@ def create_user():
         if user != None:
             return jsonify({'message': 'El usuario ya existe en la base de datos'}), 500
         
-        user = Users.query.filter_by(request.json['email'], status_id=status.id).first()
-        
         if user == None:
             new_user = Users(request.json['email'],
                             request.json['user_name'],
                             generate_password_hash(request.json['password_user'], method='sha256'),
                             request.json['phone'],
                             request.json['address'],
-                            request.json['rol_id'],
-                            status.id)
+                            role.id,
+                            status_activo.id)
             db.session.add(new_user)
         else:
             actual = datetime.now()
