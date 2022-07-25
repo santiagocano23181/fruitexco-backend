@@ -99,7 +99,7 @@ def create_user():
             user.user_name = request.json['user_name']
             user.guid = str(uuid.uuid4())
             user.phone = request.json['phone']
-            user.password = generate_password_hash(request.json['password_user'], method='sha256')
+            user.password = generate_password_hash(request.json['password'], method='sha256')
             user.address = request.json['address']
             user.rol_id = request.json['rol_id']
             user.exp_time = actual + timedelta(minutes=15)
@@ -130,7 +130,7 @@ def create_user():
         
         user = Users.query.filter_by(email=request.json['email'], status_id=status.id).first()
         
-        if not user != None or not check_password_hash(user.password, request.json['password_user']):
+        if not user != None or not check_password_hash(user.password, request.json['password']):
             return jsonify({'message': 'Asegurate que los datos son correctos e intentalo de nuevo'}), 404
         
         user_dict = json.loads(user_schema.dumps(user))
