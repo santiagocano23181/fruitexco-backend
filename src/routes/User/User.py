@@ -16,7 +16,7 @@ users = Blueprint('users', __name__)
 class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Users
-        exclude = ('password_user',)
+        exclude = ('password',)
         include_fk = True
         
 user_schema = UserSchema()
@@ -87,7 +87,7 @@ def create_user():
         if user == None:
             new_user = Users(request.json['email'],
                             request.json['user_name'],
-                            generate_password_hash(request.json['password_user'], method='sha256'),
+                            generate_password_hash(request.json['password'], method='sha256'),
                             request.json['phone'],
                             request.json['address'],
                             role.id,
