@@ -3,7 +3,7 @@ from config import config
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from decouple import config
-from routes.User import UserStatus, Role
+from routes.User import UserStatus, Role, User
 from routes.Product import Products, Mesure, ProductStatus, Taste
 from routes.Sale import SaleStatus
 
@@ -26,6 +26,7 @@ app.register_blueprint(Taste.taste, url_prefix='/api/v1/taste')
 # User Blueprints
 app.register_blueprint(UserStatus.user_status, url_prefix='/api/v1/user_status')
 app.register_blueprint(Role.role, url_prefix='/api/v1/role')
+app.register_blueprint(User.users, url_prefix='/api/v1/user')
 
 # Sale Blueprints
 app.register_blueprint(SaleStatus.sale_status, url_prefix='/api/v1/sale_status')
