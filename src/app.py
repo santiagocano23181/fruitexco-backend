@@ -2,6 +2,7 @@ from flask import Flask
 from config import config
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_cors import CORS
 from decouple import config
 from routes.User import UserStatus, Role, User
 from routes.Product import Products, Mesure, ProductStatus, Taste
@@ -13,6 +14,7 @@ app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+cors = CORS(app, resources={r"/api/*": {"origins": "*", "supports_credentials": True}})
 
 def page_not_found(error):
     return '<h1>Page not found<h1>', 404
