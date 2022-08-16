@@ -16,6 +16,8 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 cors = CORS(app, resources={r"/api/*": {"origins": "*", "supports_credentials": True}})
 
+db.create_all()
+
 def page_not_found(error):
     return '<h1>Page not found<h1>', 404
 
@@ -35,4 +37,6 @@ app.register_blueprint(SaleStatus.sale_status, url_prefix='/api/v1/sale_status')
 
 # Error handlers
 app.register_error_handler(404, page_not_found)
+
+
 

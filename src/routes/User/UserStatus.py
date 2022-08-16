@@ -25,7 +25,6 @@ def list_user_status():
 def create_user_status():
     try:
         new_user_status = UserStatus(request.json['name'])
-        print(new_user_status)
         db.session.add(new_user_status)
         db.session.commit()
         return jsonify({'message': 'Elemento creado'}), 200

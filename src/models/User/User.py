@@ -11,7 +11,10 @@ class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     guid = db.Column(db.String(36), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    user_name = db.Column(db.String(125), unique=True, nullable=False)
+    first_name = db.Column(db.String(45), nullable=False)
+    second_name = db.Column(db.String(45))
+    first_surname = db.Column(db.String(45), nullable=False)
+    second_surname = db.Column(db.String(45))
     password = db.Column(db.String(200), unique=True, nullable=False)
     exp_time = db.Column(db.DateTime, nullable=False)
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -28,11 +31,14 @@ class Users(db.Model):
                              backref='users', 
                              primaryjoin="Users.status_id == UserStatus.id")
     
-    def __init__(self, email, user_name, password, phone, address, role_id, status_id) -> None:
+    def __init__(self, email, first_name, second_name, first_surname, second_surname, password, phone, address, role_id, status_id) -> None:
         actual = datetime.now()
         self.guid = str(uuid.uuid4())
         self.email = email
-        self.user_name = user_name
+        self.first_name = first_name
+        self.second_name = second_name
+        self.first_surname = first_surname
+        self.second_surname = second_surname
         self.password = password
         self.phone = phone
         self.address = address
