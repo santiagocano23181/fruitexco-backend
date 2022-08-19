@@ -1,11 +1,13 @@
 from datetime import datetime, timedelta
 import email
+from email import message
 from itertools import product
 from multiprocessing import context
 from flask_cors import cross_origin
 from flask import session
 import json
 import uuid
+import jwt
 from flask import Blueprint, jsonify, request
 from models.User.User import Users
 from models.User.UserStatus import UserStatus
@@ -64,12 +66,13 @@ def list_users():
 @users.route('/get/profile')
 def get_user_by_guid():
     try:
-        id = request.headers.get('Authorization')
+        id = session.get('Authorization')
         user = Users.query.filter_by(id=id).first()
         u = json.loads(user_schema.dumps(user))
         u['role'] = get_role(user.role_id)
         u['status'] = get_status(user.status_id)
         u.pop('password')
+        session.pop('Authorization')
         return jsonify(u)
     except Exception as ex:
         return jsonify({"message": str(ex)}), 500
@@ -92,6 +95,7 @@ def create_user():
     try:
         status = UserStatus.query.filter_by(name="INACTIVO").first()
         status_activo = UserStatus.query.filter_by(name="ACTIVO").first()
+        status_eliminado = UserStatus.query.filter_by(name="ELIMINADO").first()
         role = Role.query.filter_by(name="USUARIO").first()
         print(request.json)
         if status == None:
@@ -101,7 +105,11 @@ def create_user():
 
         if user != None:
             return jsonify(messages='El usuario ya existe en la base de datos', context=2), 401
-
+        user = Users.query.filter_by(
+            email=request.json['email'], status_id=status.id).first()
+        if user == None:
+            user = Users.query.filter_by(
+                email=request.json['email'], status_id=status_eliminado.id).first()
         if user == None:
             new_user = Users(request.json['email'],
                              request.json['first_name'],
@@ -129,6 +137,7 @@ def create_user():
             user.address = request.json['address']
             user.rol_id = role.id,
             user.exp_time = actual + timedelta(minutes=15)
+            user.status_id = status.id
         db.session.commit()
 
         user = Users.query.filter_by(email=request.json['email']).first()
@@ -142,7 +151,7 @@ def create_user():
 
         send_email('Activar cuenta', email, user.email)
 
-        return jsonify(user_dict), 200
+        return jsonify(messages='Si la dirección de correo exite, recibira un correo para activar y acceder a su cuenta'), 200
     except Exception as ex:
         return jsonify(messages=str(ex)), 500
 
@@ -167,6 +176,8 @@ def login():
         session['user_rol'] = {'id': user.role_id, 'rol': user_dict['role']}
         actual = datetime.now()
         session['exp_time'] = user.exp_time = actual + timedelta(minutes=15)
+        user_dict['id'] = jwt.encode(
+            {'id': user_dict['id']}, config('SECRET_KEY'), algorithm="HS256")
         return jsonify(user_dict), 200
     except Exception as ex:
         return jsonify(messages=str(ex), context=3), 500
@@ -262,46 +273,75 @@ def validate_recover_user(guid):
         return jsonify(messages=str(ex)), 500
 
 
-@users.route('/delete/<id>', methods=['DELETE'])
-def delete_user(id):
+@users.route('/delete', methods=['DELETE'])
+def delete_user():
     try:
+        status = UserStatus.query.filter_by(name="ELIMINADO").first()
+        id = session.get('Authorization')
         user = Users.query.get(id)
         if user == None:
             return jsonify({'message': 'No existe un estado el usuario con este ID'}), 404
-        db.session.delete(user)
+        user.status_id = status.id
         db.session.commit()
         return jsonify({'message': 'Elemento eliminado'}), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify(messages=str(ex)), 500
 
 
-@users.route('/update/<id>', methods=['PUT'])
-def update_user(id):
+@users.route('/update', methods=['PUT'])
+def update_user():
     try:
+        id = session.get('Authorization')
         user = Users.query.get(id)
         if user == None:
             return jsonify({'message': 'No existe un estado el usuario con este ID'}), 404
 
+        user.first_name = request.json['first_name']
+        user.second_name = request.json['second_name']
+        user.first_surname = request.json['first_surname']
+        user.second_surname = request.json['second_surname']
         user.email = request.json['email']
-        user.user_name = request.json['user_name']
         user.phone = request.json['phone']
         user.address = request.json['address']
-        user.rol_id = request.json['rol_id']
 
         user_dict = json.loads(user_schema.dumps(user))
-        user_dict['status'] = get_status(request.json['status_id'])
-        user_dict['role'] = get_role(request.json['role_id'])
+        user_dict['status'] = get_status(user.status_id)
+        user_dict['role'] = get_role(user.role_id)
         user_dict.pop('password')
         db.session.commit()
+        session.pop('Authorization')
         return jsonify(user_dict), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify(messages=str(ex)), 500
 
-@users.route('/logout/<id>', methods=['DELETE'])
-def logout_session(id):
+
+@users.route('/update/password', methods=['PUT'])
+def update_user_pass():
+    try:
+        id = session.get('Authorization')
+        user = Users.query.get(id)
+        if user == None:
+            return jsonify(messages='No existe un estado el usuario con este ID', context=2), 404
+        if not check_password_hash(user.password, request.json['password']):
+            return jsonify(messages='Asegurate que los datos son correctos e intentalo de nuevo', context=2), 403
+        user.password = generate_password_hash(
+            request.json['new_password'], method='sha256')
+        user.guid = str(uuid.uuid4())
+        db.session.commit()
+        session.pop('Authorization')
+        return jsonify(messages='Contraseña modificada', context=0), 200
+    except Exception as ex:
+        return jsonify(messages=str(ex), context=2), 500
+
+
+@users.route('/logout', methods=['DELETE'])
+def logout_session():
+    id = session.get('Authorization')
     session.pop('user_session', None)
     session.pop('user_rol', None)
     session.pop('exp_time', None)
+    return jsonify(messages='Exito al cerrar sesión', context=0), 200
+
 
 def get_role(id: int):
     role = Role.query.get(id)
