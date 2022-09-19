@@ -6,6 +6,7 @@ from models.Product.Products import Products
 from models.Product.Mesure import Mesure
 from models.Product.Taste import Taste
 from models.Product.ProductStatus import ProductStatus
+from models.Product.Section import Section
 from utils.db import db
 from utils.ma import ma
 
@@ -40,6 +41,13 @@ class StatusProductSchema(ma.Schema):
 status_schema = StatusProductSchema()
 many_status_schema = StatusProductSchema(many=True)
 
+class SectionSchema(ma.Schema):
+    class Meta:
+        fields = ('id','name', 'description')
+        
+section_schema = SectionSchema()
+many_section_schema = SectionSchema(many=True)
+
 @products.route('/')
 def list_products():
     try:
@@ -51,6 +59,7 @@ def list_products():
             p['mesure'] = get_mesure(p['mesure_id'])
             p['taste'] = get_taste(p['taste_id'])
             p['status'] = get_status(p['status_id'])
+            p['section'] = get_section(p['section_id'])
         return jsonify(products)
     except Exception as ex:
         return jsonify({"message": str(ex)}), 500
@@ -63,6 +72,7 @@ def get_product(id):
         p['mesure'] = get_mesure(p['mesure_id'])
         p['taste'] = get_taste(p['taste_id'])
         p['status'] = get_status(p['status_id'])
+        p['section'] = get_section(p['section_id'])
         return jsonify(p)
     except Exception as ex:
         return jsonify({"message": str(ex)}), 500
@@ -94,7 +104,8 @@ def create_products():
                                request.json['photo'],
                                mesure.id,
                                taste.id,
-                               request.json['status_id'])
+                               request.json['status_id'],
+                               request.json['section_id'])
         db.session.add(new_product)
         db.session.commit()
         return jsonify(messages='Elemento creado', context=0), 200
@@ -145,6 +156,7 @@ def update_product(id):
         product.mesure_id = mesure.id
         product.taste_id = taste.id
         product.status_id = request.json['status_id']
+        product.section_id = request.json['section_id']
         
         db.session.commit()
         return jsonify(messages='Elemento actualizado', context=0), 200
@@ -163,3 +175,6 @@ def get_status(id: int):
     status = ProductStatus.query.get(id)
     return json.loads(status_schema.dumps(status))
     
+def get_section(id: int):
+    section = Section.query.get(id)
+    return json.loads(section_schema.dumps(section))

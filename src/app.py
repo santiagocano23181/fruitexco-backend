@@ -19,7 +19,7 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 cors = CORS(app, resources={
             r"/api/*": {"origins": "*", "supports_credentials": True}})
-
+db.drop_all()
 db.create_all()
 
 

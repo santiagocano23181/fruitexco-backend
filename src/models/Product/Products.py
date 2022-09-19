@@ -23,14 +23,19 @@ class Products(db.Model):
     #status
     status_id = db.Column(db.Integer, db.ForeignKey('product_status.id'),nullable=False)
     status = db.relationship('ProductStatus', backref=db.backref('products', lazy=True))
+
+    #section
+    section_id = db.Column(db.Integer, db.ForeignKey('section.id'),nullable=False)
+    section = db.relationship('Section', backref=db.backref('products', lazy=True))
     
-    def __init__(self, price, photo, mesure_id, taste_id, status_id) -> None:
+    def __init__(self, price, photo, mesure_id, taste_id, status_id, section_id) -> None:
         self.price = price
         self.created_on = datetime.now()
         self.photo = photo
         self.mesure_id = mesure_id
         self.taste_id = taste_id
         self.status_id = status_id
+        self.section_id = section_id
     
     def __repr__(self) -> str:
         return "<Mesure %r>" % self.price
