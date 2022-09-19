@@ -18,8 +18,11 @@ class Users(db.Model):
     password = db.Column(db.String(200), unique=True, nullable=False)
     exp_time = db.Column(db.DateTime, nullable=False)
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    tries = db.Column(db.Integer, default=0)
     phone = db.Column(db.String(14), nullable=False)
     address = db.Column(db.String(100), nullable=False)
+    updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     
     # Role
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
@@ -43,6 +46,8 @@ class Users(db.Model):
         self.phone = phone
         self.address = address
         self.created_on = actual
+        self.updated_on = actual
+        self.tries = 0
         self.exp_time = actual + timedelta(minutes=15)
         self.role_id = role_id
         self.status_id = status_id

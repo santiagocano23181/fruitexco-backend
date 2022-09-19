@@ -1,3 +1,4 @@
+from email.mime import message
 from flask import Flask
 from config import config
 from flask_sqlalchemy import SQLAlchemy
@@ -7,8 +8,7 @@ from decouple import config
 from routes.User import UserStatus, Role, User
 from routes.Product import Products, Mesure, ProductStatus, Taste
 from routes.Sale import SaleStatus
-from flask import request
-from flask import session
+from flask import request, jsonify, session
 import jwt
 
 app = Flask(__name__)
@@ -51,7 +51,16 @@ app.register_error_handler(404, page_not_found)
 @app.before_request
 def session_middleware():
     auth = request.headers.get('Authorization')
-    if(auth):
-        print(auth)
-        value = jwt.decode(auth, config('SECRET_KEY'), algorithms=["HS256"])
-        session['Authorization'] = value['id']
+    method = request.method
+    if(method != 'OPTIONS'):
+        if(auth):
+            value = jwt.decode(auth, config('SECRET_KEY'), algorithms=["HS256"])
+            session['Authorization'] = value['id']
+        else:
+            url = request.base_url
+            if not 'user' in url:
+                return jsonify(message='Usuario no valido', context=3), 403
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db.session.remove()
