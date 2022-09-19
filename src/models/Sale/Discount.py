@@ -8,6 +8,13 @@ class Discount(db.Model):
     amount = db.Column(db.Numeric, nullable=False)
     start_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     finish_date = db.Column(db.DateTime)
+    needed = db.Column(db.Numeric, nullable=True)
+
+    def __init__(self, amount, needed) -> None:
+        actual = datetime.now()
+        self.amount = amount
+        self.needed = needed
+        self.start_date = actual
     
     def __repr__(self) -> str:
         return "<Discount %r>" % self.amount

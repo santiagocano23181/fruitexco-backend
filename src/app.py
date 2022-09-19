@@ -6,8 +6,8 @@ from flask_marshmallow import Marshmallow
 from flask_cors import CORS
 from decouple import config
 from routes.User import UserStatus, Role, User
-from routes.Product import Products, Mesure, ProductStatus, Taste
-from routes.Sale import SaleStatus
+from routes.Product import Products, Mesure, ProductStatus, Taste, Section
+from routes.Sale import SaleStatus, Discount, Domicile
 from flask import request, jsonify, session
 import jwt
 
@@ -33,6 +33,7 @@ app.register_blueprint(ProductStatus.product_status,
                        url_prefix='/api/v1/product_status')
 app.register_blueprint(Mesure.mesure, url_prefix='/api/v1/mesure')
 app.register_blueprint(Taste.taste, url_prefix='/api/v1/taste')
+app.register_blueprint(Section.section, url_prefix='/api/v1/section')
 
 # User Blueprints
 app.register_blueprint(UserStatus.user_status,
@@ -43,23 +44,29 @@ app.register_blueprint(User.users, url_prefix='/api/v1/user')
 # Sale Blueprints
 app.register_blueprint(SaleStatus.sale_status,
                        url_prefix='/api/v1/sale_status')
+app.register_blueprint(Domicile.domicile, url_prefix='/api/v1/domicile')
+app.register_blueprint(Discount.discount, url_prefix='/api/v1/discount')
 
 # Error handlers
 app.register_error_handler(404, page_not_found)
 
 # Middlewares
+
+
 @app.before_request
 def session_middleware():
     auth = request.headers.get('Authorization')
     method = request.method
     if(method != 'OPTIONS'):
         if(auth):
-            value = jwt.decode(auth, config('SECRET_KEY'), algorithms=["HS256"])
+            value = jwt.decode(auth, config('SECRET_KEY'),
+                               algorithms=["HS256"])
             session['Authorization'] = value['id']
         else:
             url = request.base_url
             if not 'user' in url:
                 return jsonify(message='Usuario no valido', context=3), 403
+
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):

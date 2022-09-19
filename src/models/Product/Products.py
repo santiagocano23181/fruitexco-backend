@@ -38,4 +38,4 @@ class Products(db.Model):
         self.section_id = section_id
     
     def __repr__(self) -> str:
-        return "<Mesure %r>" % self.price
+        return "<Products %r>" % self.price
