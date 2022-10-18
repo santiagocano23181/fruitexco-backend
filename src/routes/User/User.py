@@ -105,7 +105,7 @@ def create_user():
             email=request.json['email'], status_id=status_activo.id).first()
 
         if user != None:
-            return jsonify(messages='El usuario ya existe en la base de datos', context=2), 401
+            return jsonify(messages='El usuario ya existe', context=2), 401
         user = Users.query.filter_by(
             email=request.json['email'], status_id=status.id).first()
         if user == None:
@@ -152,7 +152,7 @@ def create_user():
 
         send_email('Activar cuenta', email, user.email)
 
-        return jsonify(messages='Si la dirección de correo exite, recibira un correo para activar y acceder a su cuenta'), 200
+        return jsonify(messages='Si la dirección de correo exite, recibira un correo para activar y acceder a su cuenta', context=1), 200
     except Exception as ex:
         return jsonify(messages=str(ex)), 500
 
@@ -163,12 +163,16 @@ def login():
         status = UserStatus.query.filter_by(name="ACTIVO").first()
         if status == None:
             return jsonify(message='No es posible consultar usuario porque no hay datos en la base de datos', context=3), 500
+
         user = Users.query.filter_by(
             email=request.json['email'], status_id=status.id).first()
+
         if user == None:
             return jsonify(messages='Problema al intentar iniciar sesion', context=2), 404
+            
         now = datetime.now()
         hours = math.floor((now - user.updated_on) / timedelta(hours=1))
+
         if user.tries >= 5:
             if hours < 24:
                 url = config('FRONT_URL') + 'auth/recover/' + user.guid
@@ -178,16 +182,17 @@ def login():
                 db.session.commit()
                 send_email('Recuperar cuenta', email, user.email)
                 return jsonify(messages=f'Se le han acabado los intentos Intentelo en {24 - hours} hora(s)'), 403
-            else:
-                user.tries = 0
-                user.updated_on = now
-                db.session.commit()
+
+        if hours > 24:
+            user.tries = 0
+            db.session.commit()
+
         if not check_password_hash(user.password, request.json['password']):
-            if(user.tries == 0):
-                user.updated_on = now
+            user.updated_on = now
             user.tries = user.tries + 1
             db.session.commit()
             return jsonify(messages='Asegurate que los datos son correctos e intentalo de nuevo'), 404
+
         user.tries = 0
         db.session.commit()
         user_dict = json.loads(user_schema.dumps(user))

@@ -11,6 +11,7 @@ class Taste(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
+    products = db.relationship("Products", back_populates="taste")
     
     def __init__(self, name) -> None:
         self.name = name

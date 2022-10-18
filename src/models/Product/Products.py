@@ -18,7 +18,7 @@ class Products(db.Model):
     
     #taste
     taste_id = db.Column(db.Integer, db.ForeignKey('taste.id'),nullable=False)
-    taste = db.relationship('Taste', backref=db.backref('products', lazy=True))
+    taste = db.relationship('Taste', back_populates="products")
     
     #status
     status_id = db.Column(db.Integer, db.ForeignKey('product_status.id'),nullable=False)
@@ -26,7 +26,7 @@ class Products(db.Model):
 
     #section
     section_id = db.Column(db.Integer, db.ForeignKey('section.id'),nullable=False)
-    section = db.relationship('Section', backref=db.backref('products', lazy=True))
+    section = db.relationship('Section', back_populates="products")
     
     def __init__(self, price, photo, mesure_id, taste_id, status_id, section_id) -> None:
         self.price = price
