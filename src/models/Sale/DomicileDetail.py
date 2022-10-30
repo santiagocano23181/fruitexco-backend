@@ -18,4 +18,4 @@ class DomicileDetail(db.Model):
     domicile = db.relationship('Domicile', backref=db.backref('domicile_details', lazy=True))
     
     def __repr__(self) -> str:
-        return "<DomicileDetail %r>" % self.address
+        return '<DomicileDetail %r>' % self.address

@@ -12,6 +12,6 @@ class Role(db.Model):
         self.name = name
 
     def __repr__(self) -> str:
-        return "<Role %r>" % self.name
+        return '<Role %r>' % self.name
 
-event.listen(Role.__table__, 'after_create', DDL("""INSERT INTO role (id, name) VALUES (1, 'ADMINISTRADOR'), (2, 'EMPLEADO'), (3, 'USUARIO')"""))
+event.listen(Role.__table__, 'after_create', DDL('''INSERT INTO role (id, name) VALUES (1, 'ADMINISTRADOR'), (2, 'EMPLEADO'), (3, 'USUARIO')'''))

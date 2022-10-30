@@ -6,7 +6,7 @@ class SaleDetail(db.Model):
     __tablename__ = 'sale_details'
     
     id = db.Column(db.Integer, primary_key=True)
-    cuantity = db.Column(db.Float)
+    cantity = db.Column(db.Float)
     
     #Sale
     sale_id = db.Column(db.Integer,  db.ForeignKey('sales.id'))
@@ -15,6 +15,11 @@ class SaleDetail(db.Model):
     #Products
     products_id = db.Column(db.Integer,  db.ForeignKey('products.id'))
     products = db.relationship('Products', backref=db.backref('sale_details', lazy=True))
+
+    def __init__(self, sale_id, products_id, cantity) -> None:
+        self.sale_id = sale_id
+        self.products_id = products_id
+        self.cantity = cantity
     
     def __repr__(self) -> str:
-        return "<SaleDetail %r>" % self.address
+        return '<SaleDetail %r>' % self.address

@@ -17,4 +17,4 @@ class Discount(db.Model):
         self.start_date = actual
     
     def __repr__(self) -> str:
-        return "<Discount %r>" % self.amount
+        return '<Discount %r>' % self.amount

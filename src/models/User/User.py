@@ -32,7 +32,7 @@ class Users(db.Model):
     status_id = db.Column(db.Integer, db.ForeignKey('user_status.id'), nullable=False)
     status = db.relationship('UserStatus', 
                              backref='users', 
-                             primaryjoin="Users.status_id == UserStatus.id")
+                             primaryjoin='Users.status_id == UserStatus.id')
     
     def __init__(self, email, first_name, second_name, first_surname, second_surname, password, phone, address, role_id, status_id) -> None:
         actual = datetime.now()
@@ -53,4 +53,4 @@ class Users(db.Model):
         self.status_id = status_id
     
     def __repr__(self) -> str:
-        return "<User %r>" % self.guid
+        return '<User %r>' % self.guid

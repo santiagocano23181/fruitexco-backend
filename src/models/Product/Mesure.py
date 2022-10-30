@@ -10,4 +10,4 @@ class Mesure(db.Model):
         self.name = name
     
     def __repr__(self) -> str:
-        return "<Mesure %r>" % self.name
+        return '<Mesure %r>' % self.name

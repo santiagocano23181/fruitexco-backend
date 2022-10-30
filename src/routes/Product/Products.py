@@ -58,15 +58,15 @@ many_product_schema = ProductSchema(many=True)
 @products.route('/')
 def list_products():
     try:
-        status = ProductStatus.query.filter_by(name="INACTIVO").first()
-        status_activo = ProductStatus.query.filter_by(name="ACTIVO").first()
+        status = ProductStatus.query.filter_by(name='INACTIVO').first()
+        status_activo = ProductStatus.query.filter_by(name='ACTIVO').first()
         product = Products.query.filter(or_(Products.status_id == status.id, Products.status_id == status_activo.id))
         products_json = json.loads(many_product_schema.dumps(product))
         return jsonify(products_json)
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
 
-@products.route('/get/<int:id>')
+@products.route('/<int:id>')
 def get_product(id):
     try:
         product = Products.query.get(id)
@@ -77,9 +77,9 @@ def get_product(id):
         p['section'] = get_section(p['section_id'])
         return jsonify(p)
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
     
-@products.route('/new', methods=['PUT'])
+@products.route('/', methods=['POST'])
 def create_products():
     try:
         if request.json['mesure_id'] == 'otro':
@@ -114,10 +114,10 @@ def create_products():
     except Exception as ex:
         return jsonify(messages=str(ex), context=5), 500
     
-@products.route('/delete/<id>', methods=['DELETE'])
+@products.route('/<id>', methods=['DELETE'])
 def delete_products(id):
     try:
-        status = ProductStatus.query.filter_by(name="RETIRADO").first()
+        status = ProductStatus.query.filter_by(name='RETIRADO').first()
         product=Products.query.get(id)
         if product == None:
             return jsonify({'message': 'No existe un estado el usuario con este ID'}), 404
@@ -127,7 +127,7 @@ def delete_products(id):
     except Exception as ex:
         return jsonify(messages=str(ex), context=3), 500
     
-@products.route('/update/<id>', methods=['PUT'])
+@products.route('/<id>', methods=['PUT'])
 def update_product(id):
     try:
         product=Products.query.get(id)
@@ -165,11 +165,11 @@ def update_product(id):
     except Exception as ex:
         return jsonify(messages=str(ex), context=5), 500
     
-@products.route('/product/taste/<id>', methods=['GET'])
+@products.route('/taste/<id>', methods=['GET'])
 def get_products_by_taste_id(id):
     try:
-        status_activo = ProductStatus.query.filter_by(name="ACTIVO").first()
-        product = Products.query.filter_by(and_(Products.taste_id==id, Products.status_id==status_activo.id)).all()
+        status_activo = ProductStatus.query.filter_by(name='ACTIVO').first()
+        product = Products.query.filter(and_(Products.taste_id==id, Products.status_id==status_activo.id)).all()
         products_json = json.loads(many_product_schema.dumps(product))
         return jsonify(products_json)
     except Exception as ex:

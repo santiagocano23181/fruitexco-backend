@@ -7,7 +7,7 @@ from flask_cors import CORS
 from decouple import config
 from routes.User import UserStatus, Role, User
 from routes.Product import Products, Mesure, ProductStatus, Taste, Section
-from routes.Sale import SaleStatus, Discount, Domicile
+from routes.Sale import SaleStatus, Discount, Domicile, Sale, SaleDetail
 from flask import request, jsonify, session
 import jwt
 
@@ -18,7 +18,7 @@ app.config.from_object('config.DevelopmentConfig')
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 cors = CORS(app, resources={
-            r"/api/*": {"origins": "*", "supports_credentials": True}})
+            r'/api/*': {'origins': '*', 'supports_credentials': True}})
 db.drop_all()
 db.create_all()
 
@@ -46,6 +46,8 @@ app.register_blueprint(SaleStatus.sale_status,
                        url_prefix='/api/v1/sale_status')
 app.register_blueprint(Domicile.domicile, url_prefix='/api/v1/domicile')
 app.register_blueprint(Discount.discount, url_prefix='/api/v1/discount')
+app.register_blueprint(SaleDetail.sale_detail, url_prefix='/api/v1/sale_detail')
+app.register_blueprint(Sale.sale, url_prefix='/api/v1/sale')
 
 # Error handlers
 app.register_error_handler(404, page_not_found)
@@ -60,7 +62,7 @@ def session_middleware():
     if(method != 'OPTIONS'):
         if(auth):
             value = jwt.decode(auth, config('SECRET_KEY'),
-                               algorithms=["HS256"])
+                               algorithms=['HS256'])
             session['Authorization'] = value['id']
         else:
             url = request.base_url

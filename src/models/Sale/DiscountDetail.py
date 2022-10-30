@@ -6,7 +6,6 @@ class DiscountDetail(db.Model):
     __tablename__ = 'discount_details'
     
     id = db.Column(db.Integer, primary_key=True)
-    cuantity = db.Column(db.Float, nullable=False)
     
     #Discount
     discount_id = db.Column(db.Integer,  db.ForeignKey('discount.id'))
@@ -15,6 +14,10 @@ class DiscountDetail(db.Model):
     #Sale details
     sale_details_id = db.Column(db.Integer,  db.ForeignKey('sale_details.id'))
     sale_details = db.relationship('SaleDetail', backref=db.backref('discount_details', lazy=True))
+
+    def __init__(self, discount_id, sale_details_id) -> None:
+        self.discount_id = discount_id
+        self.sale_details_id = sale_details_id
     
     def __repr__(self) -> str:
-        return "<DiscountDetail %r>" % self.address
+        return '<DiscountDetail %r>' % self.address

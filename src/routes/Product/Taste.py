@@ -19,9 +19,9 @@ def list_taste():
         tastes = Taste.query.all()
         return many_taste_schema.jsonify(tastes)
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
     
-@taste.route('/new', methods=['PUT'])
+@taste.route('/', methods=['POST'])
 def create_taste():
     try:
         new_taste = Taste(request.json['name'])
@@ -30,9 +30,9 @@ def create_taste():
         db.session.commit()
         return jsonify({'message': 'Elemento creado'}), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
     
-@taste.route('/delete/<id>', methods=['DELETE'])
+@taste.route('/<id>', methods=['DELETE'])
 def delete_taste(id):
     try:
         taste=Taste.query.get(id)
@@ -42,9 +42,9 @@ def delete_taste(id):
         db.session.commit()
         return jsonify({'message': 'Elemento eliminado'}), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
     
-@taste.route('/update/<id>', methods=['PUT'])
+@taste.route('/<id>', methods=['PUT'])
 def update_taste(id):
     try:
         taste=Taste.query.get(id)
@@ -54,9 +54,9 @@ def update_taste(id):
         db.session.commit()
         return jsonify({'message': 'Elemento actualizado'}), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
     
-@taste.route('/get/<id>')
+@taste.route('/<id>')
 def get_taste(id):
     try:
         taste=Taste.query.get(id)
@@ -64,4 +64,4 @@ def get_taste(id):
             return jsonify({'message': 'No existe un estado el usuario con este ID'}), 404
         return taste_schema.jsonify(taste)
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500

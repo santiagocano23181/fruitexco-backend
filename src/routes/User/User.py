@@ -61,10 +61,10 @@ def list_users():
             u['status'] = get_status(u['status_id'])
         return jsonify(users)
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
 
 
-@users.route('/get/profile')
+@users.route('/profile')
 def get_user_by_guid():
     try:
         id = session.get('Authorization')
@@ -76,10 +76,10 @@ def get_user_by_guid():
         session.pop('Authorization')
         return jsonify(u)
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
 
 
-@users.route('/get/<int:id>')
+@users.route('/<int:id>')
 def get_user(id):
     try:
         user = Users.query.get(id)
@@ -88,17 +88,16 @@ def get_user(id):
         u['status'] = get_status(u['status_id'])
         return jsonify(u)
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
 
 
-@users.route('/new', methods=['PUT'])
+@users.route('/', methods=['POST'])
 def create_user():
     try:
-        status = UserStatus.query.filter_by(name="INACTIVO").first()
-        status_activo = UserStatus.query.filter_by(name="ACTIVO").first()
-        status_eliminado = UserStatus.query.filter_by(name="ELIMINADO").first()
-        role = Role.query.filter_by(name="USUARIO").first()
-        print(request.json)
+        status = UserStatus.query.filter_by(name='INACTIVO').first()
+        status_activo = UserStatus.query.filter_by(name='ACTIVO').first()
+        status_eliminado = UserStatus.query.filter_by(name='ELIMINADO').first()
+        role = Role.query.filter_by(name='USUARIO').first()
         if status == None:
             return jsonify(messages='No es posible consultar usuario porque no hay datos en la base de datos', context=3), 500
         user = Users.query.filter_by(
@@ -160,7 +159,7 @@ def create_user():
 @users.route('/login', methods=['POST'])
 def login():
     try:
-        status = UserStatus.query.filter_by(name="ACTIVO").first()
+        status = UserStatus.query.filter_by(name='ACTIVO').first()
         if status == None:
             return jsonify(message='No es posible consultar usuario porque no hay datos en la base de datos', context=3), 500
 
@@ -204,7 +203,7 @@ def login():
         actual = datetime.now()
         session['exp_time'] = user.exp_time = actual + timedelta(minutes=15)
         user_dict['id'] = jwt.encode(
-            {'id': user_dict['id']}, config('SECRET_KEY'), algorithm="HS256")
+            {'id': user_dict['id']}, config('SECRET_KEY'), algorithm='HS256')
         return jsonify(user_dict), 200
     except Exception as ex:
         return jsonify(messages=str(ex), context=3), 500
@@ -213,7 +212,7 @@ def login():
 @users.route('/recover', methods=['POST'])
 def recover_user():
     try:
-        status = UserStatus.query.filter_by(name="ACTIVO").first()
+        status = UserStatus.query.filter_by(name='ACTIVO').first()
         if status == None:
             return jsonify(message='No es posible consultar usuario porque no hay datos en la base de datos', context=3), 500
         user = Users.query.filter_by(
@@ -237,8 +236,8 @@ def recover_user():
 @users.route('/activate/<guid>', methods=['GET'])
 def activate_user(guid):
     try:
-        status = UserStatus.query.filter_by(name="INACTIVO").first()
-        status_activo = UserStatus.query.filter_by(name="ACTIVO").first()
+        status = UserStatus.query.filter_by(name='INACTIVO').first()
+        status_activo = UserStatus.query.filter_by(name='ACTIVO').first()
         if status == None:
             return jsonify(messages='No es posible consultar usuario porque no hay datos en la base de datos', context=3), 500
 
@@ -262,7 +261,7 @@ def activate_user(guid):
 @users.route('/reset/<guid>', methods=['POST'])
 def reset_user_password(guid):
     try:
-        status = UserStatus.query.filter_by(name="ACTIVO").first()
+        status = UserStatus.query.filter_by(name='ACTIVO').first()
         if status == None:
             return jsonify(messages='No es posible consultar usuario porque no hay datos en la base de datos', context=3), 500
 
@@ -288,7 +287,7 @@ def reset_user_password(guid):
 @users.route('/validate/recover/<guid>', methods=['GET'])
 def validate_recover_user(guid):
     try:
-        status = UserStatus.query.filter_by(name="ACTIVO").first()
+        status = UserStatus.query.filter_by(name='ACTIVO').first()
         if status == None:
             return jsonify(messages='No es posible consultar usuario porque no hay datos en la base de datos', context=3), 500
 
@@ -302,10 +301,10 @@ def validate_recover_user(guid):
         return jsonify(messages=str(ex)), 500
 
 
-@users.route('/delete', methods=['DELETE'])
+@users.route('/', methods=['DELETE'])
 def delete_user():
     try:
-        status = UserStatus.query.filter_by(name="ELIMINADO").first()
+        status = UserStatus.query.filter_by(name='ELIMINADO').first()
         id = session.get('Authorization')
         user = Users.query.get(id)
         if user == None:
@@ -317,7 +316,7 @@ def delete_user():
         return jsonify(messages=str(ex)), 500
 
 
-@users.route('/update', methods=['PUT'])
+@users.route('/', methods=['PUT'])
 def update_user():
     try:
         id = session.get('Authorization')
@@ -344,7 +343,7 @@ def update_user():
         return jsonify(messages=str(ex)), 500
 
 
-@users.route('/update/password', methods=['PUT'])
+@users.route('/password', methods=['PATCH'])
 def update_user_pass():
     try:
         id = session.get('Authorization')

@@ -15,4 +15,4 @@ class Domicile(db.Model):
         self.start_date = actual
     
     def __repr__(self) -> str:
-        return "<Domicile %r>" % self.price
+        return '<Domicile %r>' % self.price

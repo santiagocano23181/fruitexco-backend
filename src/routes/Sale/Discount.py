@@ -24,9 +24,9 @@ def get_last_discount():
             db.session.commit()
         return discount_schema.jsonify(discount), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
 
-@discount.route('/new', methods=['PUT'])
+@discount.route('/', methods=['POST'])
 def create_discount():
     try:
         actual = datetime.now()
@@ -38,5 +38,5 @@ def create_discount():
         db.session.commit()
         return jsonify({'message': 'Descuento general actualizado'}), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
     

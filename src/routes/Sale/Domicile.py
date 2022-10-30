@@ -24,9 +24,9 @@ def get_last_domicile():
             db.session.commit()
         return domicile_schema.jsonify(domicile), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
 
-@domicile.route('/new', methods=['PUT'])
+@domicile.route('/', methods=['POST'])
 def create_domicile():
     try:
         actual = datetime.now()
@@ -38,5 +38,5 @@ def create_domicile():
         db.session.commit()
         return jsonify({'message': 'Domicilio actualizado'}), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
     

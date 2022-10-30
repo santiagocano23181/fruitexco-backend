@@ -19,9 +19,9 @@ def list_product_status():
         status = ProductStatus.query.all()
         return many_status_schema.jsonify(status)
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
     
-@product_status.route('/new', methods=['PUT'])
+@product_status.route('/', methods=['POST'])
 def create_product_status():
     try:
         new_product_status = ProductStatus(request.json['name'])
@@ -30,9 +30,9 @@ def create_product_status():
         db.session.commit()
         return jsonify({'message': 'Elemento creado'}), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
     
-@product_status.route('/delete/<id>', methods=['DELETE'])
+@product_status.route('/<id>', methods=['DELETE'])
 def delete_product_status(id):
     try:
         product_status=ProductStatus.query.get(id)
@@ -42,9 +42,9 @@ def delete_product_status(id):
         db.session.commit()
         return jsonify({'message': 'Elemento eliminado'}), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
     
-@product_status.route('/update/<id>', methods=['PUT'])
+@product_status.route('/<id>', methods=['PUT'])
 def update_product_status(id):
     try:
         product_status=ProductStatus.query.get(id)
@@ -54,9 +54,9 @@ def update_product_status(id):
         db.session.commit()
         return jsonify({'message': 'Elemento actualizado'}), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
     
-@product_status.route('/get/<id>')
+@product_status.route('/<id>')
 def get_product_status(id):
     try:
         product_status=ProductStatus.query.get(id)
@@ -64,4 +64,4 @@ def get_product_status(id):
             return jsonify({'message': 'No existe un estado el usuario con este ID'}), 404
         return status_schema.jsonify(product_status)
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500

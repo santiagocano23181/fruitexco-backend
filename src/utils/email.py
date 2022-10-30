@@ -16,7 +16,7 @@ def send_email(subject: str, message: str, to: str):
     msg['To'] = to
     msg.add_header('Content-Type', 'text/html')
     msg.set_payload(message)
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as server:
         server.ehlo()
         server.login(email_address, password)
         server.sendmail(msg['From'], [msg['To']], msg.as_string().encode())

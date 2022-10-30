@@ -11,4 +11,4 @@ class Feature(db.Model):
         self.name = name
     
     def __repr__(self) -> str:
-        return "<Feature %r>" % self.name
+        return '<Feature %r>' % self.name

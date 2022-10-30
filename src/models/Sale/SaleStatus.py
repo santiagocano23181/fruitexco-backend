@@ -12,6 +12,6 @@ class SaleStatus(db.Model):
         self.name = name
 
     def __repr__(self) -> str:
-        return "<SaleStatus %r>" % self.name
+        return '<SaleStatus %r>' % self.name
 
-event.listen(SaleStatus.__table__, 'after_create', DDL("""INSERT INTO sale_status (id, name) VALUES (1, 'EN CARRITO'), (2, 'PAGADO'), (3, 'CANCELADO')"""))
+event.listen(SaleStatus.__table__, 'after_create', DDL('''INSERT INTO sale_status (id, name) VALUES (1, 'EN CARRITO'), (2, 'PAGADO'), (3, 'CANCELADO')'''))

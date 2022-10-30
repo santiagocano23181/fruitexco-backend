@@ -73,17 +73,17 @@ def list_section():
     try:
         sections = Section.query.all()
         section_json = json.loads(many_section_schema.dumps(sections))
-        status_activo = ProductStatus.query.filter_by(name="ACTIVO").first()
+        status_activo = ProductStatus.query.filter_by(name='ACTIVO').first()
         for sec in section_json:
             product = Products.query.filter(and_(Products.section_id == sec['id'], Products.status_id == status_activo.id)).distinct(
                 Products.taste_id).limit(4).all()
             sec['products'] = json.loads(many_product_schema.dumps(product))
         return jsonify(section_json)
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
 
 
-@section.route('/new', methods=['PUT'])
+@section.route('/', methods=['POST'])
 def create_section():
     try:
         new_section = Section(request.json['name'])
@@ -92,10 +92,10 @@ def create_section():
         db.session.commit()
         return jsonify({'message': 'Elemento creado'}), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
 
 
-@section.route('/update/<id>', methods=['PUT'])
+@section.route('/<id>', methods=['PUT'])
 def update_section(id):
     try:
         section = Section.query.get(id)
@@ -105,13 +105,13 @@ def update_section(id):
         db.session.commit()
         return jsonify({'message': 'Elemento actualizado'}), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
 
 
-@section.route('/get/<id>')
+@section.route('/<id>')
 def get_section(id):
     try:
-        status_activo = ProductStatus.query.filter_by(name="ACTIVO").first()
+        status_activo = ProductStatus.query.filter_by(name='ACTIVO').first()
         sections = Section.query.get(id)
         section_json = json.loads(section_schema.dumps(sections))
         product = Products.query.filter(and_(
@@ -119,4 +119,4 @@ def get_section(id):
         section_json['products'] = json.loads(many_product_schema.dumps(product))
         return jsonify(section_json)
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500

@@ -19,9 +19,9 @@ def list_sale_status():
         status = SaleStatus.query.all()
         return many_status_schema.jsonify(status)
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
     
-@sale_status.route('/new', methods=['PUT'])
+@sale_status.route('/', methods=['POST'])
 def create_sale_status():
     try:
         new_sale_status = SaleStatus(request.json['name'])
@@ -30,9 +30,9 @@ def create_sale_status():
         db.session.commit()
         return jsonify({'message': 'Elemento creado'}), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
     
-@sale_status.route('/delete/<id>', methods=['DELETE'])
+@sale_status.route('/<id>', methods=['DELETE'])
 def delete_sale_status(id):
     try:
         sale_status=SaleStatus.query.get(id)
@@ -42,9 +42,9 @@ def delete_sale_status(id):
         db.session.commit()
         return jsonify({'message': 'Elemento eliminado'}), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
     
-@sale_status.route('/update/<id>', methods=['PUT'])
+@sale_status.route('/<id>', methods=['PUT'])
 def update_sale_status(id):
     try:
         sale_status=SaleStatus.query.get(id)
@@ -54,9 +54,9 @@ def update_sale_status(id):
         db.session.commit()
         return jsonify({'message': 'Elemento actualizado'}), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
     
-@sale_status.route('/get/<id>')
+@sale_status.route('/<id>')
 def get_sale_status(id):
     try:
         sale_status=SaleStatus.query.get(id)
@@ -64,4 +64,4 @@ def get_sale_status(id):
             return jsonify({'message': 'No existe un estado el usuario con este ID'}), 404
         return status_schema.jsonify(sale_status)
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify({'message': str(ex)}), 500
