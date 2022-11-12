@@ -16,4 +16,4 @@ class Section(db.Model):
     def __repr__(self) -> str:
         return '<Mesure %r>' % self.name
 
-event.listen(Section.__table__, 'after_create', DDL('''INSERT INTO section (id, name) VALUES (1, 'LIGTH')'''))
+event.listen(Section.__table__, 'after_create', DDL('''INSERT INTO section (id, name, description) VALUES (1, 'LIGTH', 'Productos 0 azucar')'''))

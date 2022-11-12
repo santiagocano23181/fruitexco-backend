@@ -64,7 +64,7 @@ def list_products():
         products_json = json.loads(many_product_schema.dumps(product))
         return jsonify(products_json)
     except Exception as ex:
-        return jsonify({'message': str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500
 
 @products.route('/<int:id>')
 def get_product(id):
@@ -77,7 +77,7 @@ def get_product(id):
         p['section'] = get_section(p['section_id'])
         return jsonify(p)
     except Exception as ex:
-        return jsonify({'message': str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500
     
 @products.route('/', methods=['POST'])
 def create_products():
@@ -120,7 +120,7 @@ def delete_products(id):
         status = ProductStatus.query.filter_by(name='RETIRADO').first()
         product=Products.query.get(id)
         if product == None:
-            return jsonify({'message': 'No existe un estado el usuario con este ID'}), 404
+            return jsonify(messages='No existe un estado el usuario con este ID', context=2), 404
         product.status_id = status.id
         db.session.commit()
         return jsonify(messages='Elemento eliminado', context=0), 200
@@ -132,7 +132,7 @@ def update_product(id):
     try:
         product=Products.query.get(id)
         if product == None:
-            return jsonify({'message': 'No existe un estado el usuario con este ID'}), 404
+            return jsonify(messages='No existe un estado el usuario con este ID', context=2), 404
         if request.json['mesure_id'] == 'otro':
             mesure = Mesure.query.filter_by(name=str(request.json['mesure']['name']).upper()).first()
             if mesure == None:

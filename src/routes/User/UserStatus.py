@@ -19,7 +19,7 @@ def list_user_status():
         status = UserStatus.query.all()
         return many_status_schema.jsonify(status)
     except Exception as ex:
-        return jsonify({'message': str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500
     
 @user_status.route('/', methods=['POST'])
 def create_user_status():
@@ -27,40 +27,40 @@ def create_user_status():
         new_user_status = UserStatus(request.json['name'])
         db.session.add(new_user_status)
         db.session.commit()
-        return jsonify({'message': 'Elemento creado'}), 200
+        return jsonify(messages='Elemento creado', context=0), 200
     except Exception as ex:
-        return jsonify({'message': str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500
     
 @user_status.route('/<id>', methods=['DELETE'])
 def delete_user_status(id):
     try:
         user_status=UserStatus.query.get(id)
         if user_status == None:
-            return jsonify({'message': 'No existe un estado el usuario con este ID'}), 404
+            return jsonify(messages='No existe un estado el usuario con este ID', context=2), 404
         db.session.delete(user_status)
         db.session.commit()
-        return jsonify({'message': 'Elemento eliminado'}), 200
+        return jsonify(messages='Elemento eliminado', context=0), 200
     except Exception as ex:
-        return jsonify({'message': str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500
     
 @user_status.route('/<id>', methods=['PUT'])
 def update_user_status(id):
     try:
         user_status=UserStatus.query.get(id)
         if user_status == None:
-            return jsonify({'message': 'No existe un estado el usuario con este ID'}), 404
+            return jsonify(messages='No existe un estado el usuario con este ID', context=2), 404
         user_status.name = request.json['name']
         db.session.commit()
-        return jsonify({'message': 'Elemento actualizado'}), 200
+        return jsonify(messages='Elemento actualizado', context=0), 200
     except Exception as ex:
-        return jsonify({'message': str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500
     
 @user_status.route('/<id>')
 def get_user_status(id):
     try:
         user_status=UserStatus.query.get(id)
         if user_status == None:
-            return jsonify({'message': 'No existe un estado el usuario con este ID'}), 404
+            return jsonify(messages='No existe un estado el usuario con este ID', context=2), 404
         return status_schema.jsonify(user_status)
     except Exception as ex:
-        return jsonify({'message': str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500

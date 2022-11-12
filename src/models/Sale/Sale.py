@@ -25,8 +25,6 @@ class Sales(db.Model):
     status = db.relationship(
         'SaleStatus', backref=db.backref('Sales', lazy=True))
 
-    sale_detail = db.relationship('Sales', back_populates='sale_details')
-
     def __init__(self, client_id, status_id, total) -> None:
         self.client_id = client_id
         self.status_id = status_id

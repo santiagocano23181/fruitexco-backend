@@ -80,19 +80,18 @@ def list_section():
             sec['products'] = json.loads(many_product_schema.dumps(product))
         return jsonify(section_json)
     except Exception as ex:
-        return jsonify({'message': str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500
 
 
 @section.route('/', methods=['POST'])
 def create_section():
     try:
         new_section = Section(request.json['name'])
-        print(new_section)
         db.session.add(new_section)
         db.session.commit()
-        return jsonify({'message': 'Elemento creado'}), 200
+        return jsonify(messages='Elemento creado', context=0), 200
     except Exception as ex:
-        return jsonify({'message': str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500
 
 
 @section.route('/<id>', methods=['PUT'])
@@ -100,12 +99,12 @@ def update_section(id):
     try:
         section = Section.query.get(id)
         if section == None:
-            return jsonify({'message': 'No existe un estado el usuario con este ID'}), 404
+            return jsonify(messages='No existe un estado el usuario con este ID', context=2), 404
         section.name = request.json['name']
         db.session.commit()
-        return jsonify({'message': 'Elemento actualizado'}), 200
+        return jsonify(messages='Elemento actualizado', context=0), 200
     except Exception as ex:
-        return jsonify({'message': str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500
 
 
 @section.route('/<id>')
@@ -119,4 +118,4 @@ def get_section(id):
         section_json['products'] = json.loads(many_product_schema.dumps(product))
         return jsonify(section_json)
     except Exception as ex:
-        return jsonify({'message': str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500

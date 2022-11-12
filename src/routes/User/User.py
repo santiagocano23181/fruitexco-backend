@@ -61,14 +61,14 @@ def list_users():
             u['status'] = get_status(u['status_id'])
         return jsonify(users)
     except Exception as ex:
-        return jsonify({'message': str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500
 
 
 @users.route('/profile')
 def get_user_by_guid():
     try:
-        id = session.get('Authorization')
-        user = Users.query.filter_by(id=id).first()
+        user_id = session.get('Authorization')
+        user = Users.query.get(user_id)
         u = json.loads(user_schema.dumps(user))
         u['role'] = get_role(user.role_id)
         u['status'] = get_status(user.status_id)
@@ -76,7 +76,7 @@ def get_user_by_guid():
         session.pop('Authorization')
         return jsonify(u)
     except Exception as ex:
-        return jsonify({'message': str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500
 
 
 @users.route('/<int:id>')
@@ -88,7 +88,7 @@ def get_user(id):
         u['status'] = get_status(u['status_id'])
         return jsonify(u)
     except Exception as ex:
-        return jsonify({'message': str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500
 
 
 @users.route('/', methods=['POST'])
@@ -308,10 +308,10 @@ def delete_user():
         id = session.get('Authorization')
         user = Users.query.get(id)
         if user == None:
-            return jsonify({'message': 'No existe un estado el usuario con este ID'}), 404
+            return jsonify(messages='No existe un estado el usuario con este ID', context=2), 404
         user.status_id = status.id
         db.session.commit()
-        return jsonify({'message': 'Elemento eliminado'}), 200
+        return jsonify(messages='Elemento eliminado', context=0), 200
     except Exception as ex:
         return jsonify(messages=str(ex)), 500
 
@@ -322,7 +322,7 @@ def update_user():
         id = session.get('Authorization')
         user = Users.query.get(id)
         if user == None:
-            return jsonify({'message': 'No existe un estado el usuario con este ID'}), 404
+            return jsonify(messages='No existe un estado el usuario con este ID', context=2), 404
 
         user.first_name = request.json['first_name']
         user.second_name = request.json['second_name']
