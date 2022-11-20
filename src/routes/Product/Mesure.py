@@ -19,48 +19,48 @@ def list_mesure():
         status = Mesure.query.all()
         return many_mesure_schema.jsonify(status)
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500
     
-@mesure.route('/new', methods=['PUT'])
+@mesure.route('/', methods=['POST'])
 def create_mesure():
     try:
         new_mesure = Mesure(request.json['name'])
         db.session.add(new_mesure)
         db.session.commit()
-        return jsonify({'message': 'Elemento creado'}), 200
+        return jsonify(messages='Elemento creado', context=0), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500
     
-@mesure.route('/delete/<id>', methods=['DELETE'])
+@mesure.route('/<id>', methods=['DELETE'])
 def delete_mesure(id):
     try:
         mesure=Mesure.query.get(id)
         if mesure == None:
-            return jsonify({'message': 'No existe un estado el usuario con este ID'}), 404
+            return jsonify(messages='No existe un estado el usuario con este ID', context=2), 404
         db.session.delete(mesure)
         db.session.commit()
-        return jsonify({'message': 'Elemento eliminado'}), 200
+        return jsonify(messages='Elemento eliminado', context=0), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500
     
-@mesure.route('/update/<id>', methods=['PUT'])
+@mesure.route('/<id>', methods=['PUT'])
 def update_mesure(id):
     try:
         mesure=Mesure.query.get(id)
         if mesure == None:
-            return jsonify({'message': 'No existe un estado el usuario con este ID'}), 404
+            return jsonify(messages='No existe un estado el usuario con este ID', context=2), 404
         mesure.name = request.json['name']
         db.session.commit()
-        return jsonify({'message': 'Elemento actualizado'}), 200
+        return jsonify(messages='Elemento actualizado', context=0), 200
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500
     
-@mesure.route('/get/<id>')
+@mesure.route('/<id>')
 def get_mesure(id):
     try:
         user_status=Mesure.query.get(id)
         if user_status == None:
-            return jsonify({'message': 'No existe un estado el usuario con este ID'}), 404
+            return jsonify(messages='No existe un estado el usuario con este ID', context=2), 404
         return mesure_schema.jsonify(user_status)
     except Exception as ex:
-        return jsonify({"message": str(ex)}), 500
+        return jsonify(messages=str(ex), context=3), 500

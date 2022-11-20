@@ -1,20 +1,25 @@
 from utils.db import db
-from .Domicile import Domicile
+from ..Product.Products import Products
 from .Sale import Sales
 
 class SaleDetail(db.Model):
     __tablename__ = 'sale_details'
     
-    address = db.Column(db.String(100))
-    phone = db.Column(db.String(14))
+    id = db.Column(db.Integer, primary_key=True)
+    cantity = db.Column(db.Float)
     
     #Sale
-    sale_id = db.Column(db.Integer,  db.ForeignKey('sales.id'), primary_key=True)
-    sale = db.relationship('Sales', backref=db.backref('sale_detail', lazy=True))
+    sale_id = db.Column(db.Integer,  db.ForeignKey('sales.id'))
+    sale = db.relationship('Sales', backref=db.backref('sale_details', lazy=True))
     
-    #Domicile
-    sale_id = db.Column(db.Integer,  db.ForeignKey('domicile.id'), primary_key=True)
-    sale = db.relationship('Domicile', backref=db.backref('sale_detail', lazy=True))
+    #Products
+    products_id = db.Column(db.Integer,  db.ForeignKey('products.id'))
+    products = db.relationship('Products', backref=db.backref('sale_details', lazy=True))
+
+    def __init__(self, sale_id, products_id, cantity) -> None:
+        self.sale_id = sale_id
+        self.products_id = products_id
+        self.cantity = cantity
     
     def __repr__(self) -> str:
-        return "<SaleDetail %r>" % self.address
+        return '<SaleDetail %r>' % self.cantity
