@@ -22,4 +22,4 @@ class SaleDetail(db.Model):
         self.cantity = cantity
     
     def __repr__(self) -> str:
-        return '<SaleDetail %r>' % self.address
+        return '<SaleDetail %r>' % self.cantity

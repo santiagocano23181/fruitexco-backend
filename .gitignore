@@ -131,3 +131,6 @@ dmypy.json
 
 # DB Test
 *.db
+
+.idea/
+.vscode/

@@ -1,3 +1,4 @@
+import decimal
 import json
 from flask import Blueprint, jsonify, request, session
 from sqlalchemy import and_
@@ -62,12 +63,11 @@ def get_actual():
 
 @sale.route('/calculate')
 def calculate_actual():
-    try:
         addition = 0
         id = session.get('Authorization')
         sale_status = SaleStatus.query.filter_by(name='EN CARRITO').first()
         sales = Sales.query.filter(and_(Sales.status_id==sale_status.id, Sales.client_id==id)).order_by(Sales.created_on).first()
-        sale_details = SaleDetail.query.filter(sale_id=sales.id).all()
+        sale_details = SaleDetail.query.filter(SaleDetail.sale_id==sales.id).all()
         discount = Discount.query.filter_by(finish_date=None).first()
             
         for sale_detail in sale_details:
@@ -76,13 +76,11 @@ def calculate_actual():
             neto = product.price * sale_detail.cantity
             discount_detail = DiscountDetail(discount.id, sale_detail.id)
             if discount_detail != None:
-                neto = neto - (neto * (discount.amount / 100))
+                neto = decimal.Decimal(float(neto)) - (decimal.Decimal(float(neto)) * (decimal.Decimal(float(discount.amount)) / 100))
             addition = addition + neto
         sales.total = addition
         db.session.commit()
-        return sale_schema.jsonify(addition=addition)
-    except Exception as ex:
-        return jsonify(messages=str(ex), context=3), 500
+        return jsonify(addition=addition)
 
 @sale.route('/count')
 def count_actual():
@@ -92,8 +90,7 @@ def count_actual():
         sales = Sales.query.filter(and_(Sales.status_id==sale_status.id, Sales.client_id==id)).order_by(Sales.created_on).first()
         if sales == None:
             return jsonify(0)
-        sale_count = SaleDetail.query.filter(sale_id=sales.id).count()
-
+        sale_count = SaleDetail.query.filter(SaleDetail.sale_id==sales.id).count()
         return jsonify(cantity=sale_count)
     except Exception as ex:
         return jsonify(messages=str(ex), context=3), 500

@@ -31,4 +31,4 @@ class Sales(db.Model):
         self.total = total
 
     def __repr__(self) -> str:
-        return '<Sales %r>' % self.name
+        return '<Sales %r>' % self.id

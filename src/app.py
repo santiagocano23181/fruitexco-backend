@@ -1,10 +1,10 @@
 from email.mime import message
 from flask import Flask
-from config import config
+from config import config as con
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS
-from decouple import config
+from decouple import config as env
 from routes.User import UserStatus, Role, User
 from routes.Product import Products, Mesure, ProductStatus, Taste, Section
 from routes.Sale import SaleStatus, Discount, Domicile, Sale, SaleDetail
@@ -14,18 +14,23 @@ import jwt
 app = Flask(__name__)
 
 # Configurations
-app.config.from_object('config.DevelopmentConfig')
+if env('PRODUCTION', default=False):
+    app.config.from_object(con['production'])
+else:
+    app.config.from_object(con['development'])
+
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 cors = CORS(app, resources={
             r'/api/*': {'origins': '*', 'supports_credentials': True}})
-db.drop_all()
-db.create_all()
 
 
 def page_not_found(error):
     return '<h1>Page not found<h1>', 404
 
+with app.app_context():
+    db.init_app(app)
+    db.create_all()
 
 # Product Blueprints
 app.register_blueprint(Products.products, url_prefix='/api/v1/product')
@@ -61,7 +66,7 @@ def session_middleware():
     method = request.method
     if(method != 'OPTIONS'):
         if(auth):
-            value = jwt.decode(auth, config('SECRET_KEY'),
+            value = jwt.decode(auth, env('SECRET_KEY'),
                                algorithms=['HS256'])
             session['Authorization'] = value['id']
         else:

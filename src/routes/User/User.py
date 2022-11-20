@@ -3,7 +3,6 @@ import email
 from email import message
 from itertools import product
 import math
-from multiprocessing import context
 from flask_cors import cross_origin
 from flask import session
 import json
@@ -53,15 +52,12 @@ many_status_schema = StatusUserSchema(many=True)
 
 @users.route('/')
 def list_users():
-    try:
         user = Users.query.all()
         users = json.loads(many_user_schema.dumps(user))
         for u in users:
             u['role'] = get_role(u['role_id'])
             u['status'] = get_status(u['status_id'])
         return jsonify(users)
-    except Exception as ex:
-        return jsonify(messages=str(ex), context=3), 500
 
 
 @users.route('/profile')
@@ -93,7 +89,6 @@ def get_user(id):
 
 @users.route('/', methods=['POST'])
 def create_user():
-    try:
         status = UserStatus.query.filter_by(name='INACTIVO').first()
         status_activo = UserStatus.query.filter_by(name='ACTIVO').first()
         status_eliminado = UserStatus.query.filter_by(name='ELIMINADO').first()
@@ -152,8 +147,6 @@ def create_user():
         send_email('Activar cuenta', email, user.email)
 
         return jsonify(messages='Si la dirección de correo exite, recibira un correo para activar y acceder a su cuenta', context=1), 200
-    except Exception as ex:
-        return jsonify(messages=str(ex)), 500
 
 
 @users.route('/login', methods=['POST'])

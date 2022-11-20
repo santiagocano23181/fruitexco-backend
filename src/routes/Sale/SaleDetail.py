@@ -77,32 +77,33 @@ many_sale_detail_schema = SaleDetailSchema(many=True)
 @sale_detail.route('/', methods=['POST'])
 def create_sale_detail():
     try:
-        id = session.get('Authorization')
+        client_id = session.get('Authorization')
         sale_status = SaleStatus.query.filter_by(name='EN CARRITO').first()
-        sale = Sales.query.filter(and_(Sales.status_id==sale_status.id, Sales.client_id==id)).order_by(
+        sale = Sales.query.filter(and_(Sales.status_id==sale_status.id, Sales.client_id==client_id)).order_by(
             Sales.created_on).first()
+        print(sale)
         sale_details = SaleDetail.query.filter(and_(
-            sale_id=sale.id, products_id=id)).first()
+            SaleDetail.sale_id==sale.id, SaleDetail.products_id==request.json['product_id'])).first()
+        print(sale_details)
         if sale_details == None:
-            sale_details = SaleDetail(
-                sale.id, request.json['product_id'], request.json['cantity'])
+            sale_details = SaleDetail(sale.id, 
+                                      request.json['product_id'], 
+                                      request.json['cantity'])
             db.session.add(sale_details)
+            print(sale_details)
         else:
-            sale_details.cantity = sale_details.cantity + \
-                request.json['cantity']
+            sale_details.cantity = sale_details.cantity + request.json['cantity']
         discount = Discount.query.filter_by(finish_date=None).first()
         discount_detail = DiscountDetail.query.filter(
-            and_(discount.id, sale_details.id)).first()
+            and_(DiscountDetail.discount_id==discount.id, DiscountDetail.sale_details_id==sale_details.id)).first()
         if discount_detail == None:
             if(discount.needed <= request.json['cantity']):
                 discount_detail = DiscountDetail(discount.id, sale_details.id)
                 db.session.add(discount_detail)
-
         db.session.commit()
         return sale_detail_schema.jsonify(sale_details)
     except Exception as ex:
         return jsonify(messages=str(ex), context=3), 500
-
 
 @sale_detail.route('/')
 def get_sale_detail():
@@ -111,7 +112,7 @@ def get_sale_detail():
         sale_status = SaleStatus.query.filter_by(name='EN CARRITO').first()
         sale = Sales.query.filter(and_(Sales.status_id==sale_status.id, Sales.client_id==id)).order_by(
             Sales.created_on).first()
-        sale_details = SaleDetail.query.filter(sale_id=sale.id).all()
+        sale_details = SaleDetail.query.filter(SaleDetail.sale_id==sale.id).all()
         
         return many_sale_detail_schema.jsonify(sale_details)
     except Exception as ex:
