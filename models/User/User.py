@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+from werkzeug.security import generate_password_hash
+from sqlalchemy import event, DDL
 import uuid
 from utils.db import db
 from .Role import Role
@@ -54,3 +56,14 @@ class Users(db.Model):
     
     def __repr__(self) -> str:
         return '<User %r>' % self.guid
+    
+event.listen(Role.__table__, 'after_create', DDL('''INSERT INTO role (id, name) VALUES (1, 'ADMINISTRADOR')'''))
+event.listen(Role.__table__, 'after_create', DDL('''INSERT INTO role (id, name) VALUES (1, 'ADMINISTRADOR'), (3, 'USUARIO')'''))
+
+event.listen(Users.__table__, 'after_create', DDL(f'''
+    INSERT INTO users (id, guid, email, first_name, first_surname, second_surname, password, phone, address, created_on, updated_on, tries, role_id, status_id)
+    VALUES (1, '{str(uuid.uuid4())}', 'santiago_cano23181@elpoli.edu.co', 'admin', 'admin', 'admin', '{generate_password_hash('7ru173Xc03DM170NDB', method='sha256')}', '3217443912', 'Calle 106C # 69 - 22', 0, 1, 1)'''))
+
+event.listen(Users.__table__, 'after_create', DDL(f'''
+    INSERT INTO users (id, guid, email, first_name, first_surname, second_surname, password, phone, address, created_on, updated_on, tries, role_id, status_id)
+    VALUES (2, '{str(uuid.uuid4())}', 'santiagocanoo1811@gmail.com', 'admin', 'admin', 'admin', '{generate_password_hash('4l4pkawa11*', method='sha256')}', '3217443912', 'Calle 106C # 69 - 22', 0, 3, 1)'''))
