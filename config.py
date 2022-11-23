@@ -1,7 +1,8 @@
 from decouple import config
+import os
 
 class Config:
-    SECRET_KEY=config('SECRET_KEY')
+    SECRET_KEY=os.getenv("SECRET_KEY")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
 class DevelopmentConfig(Config):
@@ -11,7 +12,7 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = config('DATABASE_URL_POSTGRESQL', default='localhost')
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL_POSTGRESQL")
     TESTING = True
     
 config = {
