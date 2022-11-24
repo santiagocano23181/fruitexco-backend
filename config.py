@@ -12,7 +12,7 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = config("SECRET_KEY")
+    SQLALCHEMY_DATABASE_URI = config("DATABASE_URL_POSTGRESQL")
     TESTING = True
     
 config = {
