@@ -16,7 +16,6 @@ app = Flask(__name__)
 # Configurations
 if env('PRODUCTION', default=False):
     app.config.from_object(con['production'])
-    print('produccion')
 else:
     app.config.from_object(con['development'])
 
