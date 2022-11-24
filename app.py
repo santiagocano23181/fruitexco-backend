@@ -29,9 +29,6 @@ def page_not_found(error):
     return '<h1>Page not found<h1>', 404
 
 db.init_app(app)
-with app.app_context():
-    db.drop_all()
-    db.create_all()
 
 # Product Blueprints
 app.register_blueprint(Products.products, url_prefix='/api/v1/product')
