@@ -1,7 +1,6 @@
 from email.mime import message
 from flask import Flask
 from config import config as con
-from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS
 from decouple import config as env
@@ -9,6 +8,7 @@ from routes.User import UserStatus, Role, User
 from routes.Product import Products, Mesure, ProductStatus, Taste, Section
 from routes.Sale import SaleStatus, Discount, Domicile, Sale, SaleDetail
 from flask import request, jsonify, session
+from utils.db import db
 import jwt
 
 app = Flask(__name__)
@@ -19,7 +19,7 @@ if env('PRODUCTION', default=False):
 else:
     app.config.from_object(con['development'])
 
-db = SQLAlchemy(app)
+
 ma = Marshmallow(app)
 cors = CORS(app, resources={
             r'/api/*': {'origins': '*', 'supports_credentials': True}})
