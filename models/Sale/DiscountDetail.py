@@ -13,7 +13,7 @@ class DiscountDetail(db.Model):
     
     #Sale details
     sale_details_id = db.Column(db.Integer,  db.ForeignKey('sale_details.id'))
-    sale_details = db.relationship('SaleDetail', backref=db.backref('discount_details', lazy=True))
+    sale_details = db.relationship('SaleDetail' , back_populates = 'discount_detail', lazy = True)
 
     def __init__(self, discount_id, sale_details_id) -> None:
         self.discount_id = discount_id

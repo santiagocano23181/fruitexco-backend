@@ -15,6 +15,8 @@ class SaleDetail(db.Model):
     #Products
     products_id = db.Column(db.Integer,  db.ForeignKey('products.id'))
     products = db.relationship('Products', backref=db.backref('sale_details', lazy=True))
+    
+    discount_detail = db.relationship('DiscountDetail', back_populates = 'sale_details', lazy = True)
 
     def __init__(self, sale_id, products_id, cantity) -> None:
         self.sale_id = sale_id

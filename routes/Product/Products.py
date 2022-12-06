@@ -1,6 +1,6 @@
 import json
 from flask import Blueprint, jsonify, request
-from sqlalchemy import or_
+from sqlalchemy import or_, text
 from marshmallow_sqlalchemy.fields import Nested
 from models.Product.Products import Products
 from models.Product.Mesure import Mesure
@@ -10,6 +10,9 @@ from models.Product.Section import Section
 from utils.db import db
 from utils.ma import ma
 from sqlalchemy import and_
+import base64
+from os import remove
+from utils.CreateReport import reportePDF
 
 products = Blueprint('products', __name__)
 
@@ -174,6 +177,69 @@ def get_products_by_taste_id(id):
         return jsonify(products_json)
     except Exception as ex:
         return jsonify(messages=str(ex), context=5), 500
+    
+    
+@products.route("/report", methods=["POST"])
+def generate_report_sale():
+    try:
+        start = request.json['start']
+        finish = request.json['finish']
+
+        consulta = db.engine.execute(
+            text(
+                f"""
+                    SELECT (MAX(t.name) || ' - ' || MAX(m.name)) as NOMBRE, SUM(sd.cantity) as VENDIDO
+                    FROM sales s
+                    INNER JOIN sale_status ss 
+                    ON ss.id = s.status_id
+                    INNER JOIN sale_details sd
+                    ON sd.sale_id = s.id
+                    INNER JOIN products p 
+                    ON p.id = sd.products_id
+                    INNER JOIN mesure m 
+                    ON m.id = p.mesure_id
+                    INNER JOIN taste t 
+                    ON t.id = p.taste_id
+                    WHERE s.updated_on > '{start}' 
+                    AND s.updated_on < '{finish}' 
+                    AND (ss."name" = 'PAGADO' OR ss."name" = 'ENVIADO')
+                    GROUP BY p.id
+                    ORDER BY VENDIDO DESC"""
+            )
+        )
+        datos = []
+        total = 0
+        id_bill = 0
+        for row in consulta:
+            datos.append(
+                {
+                    "NOMBRE": row[0],
+                    "VENDIDO": row[1],
+                }
+            )
+        cabecera = (
+            ("NOMBRE", "NOMBRE DEL PRODUCTO"),
+            ("VENDIDO", "CANTIDAD VENDIDA"),
+        )
+
+        titulo = "REPORTE PRODUCTOS"
+
+        nombrePDF = (
+            f"Reporte productos {start} - {finish}.pdf"
+        )
+
+        reportePDF(
+            titulo, cabecera, datos, nombrePDF, None, "{:0>9}".format(id_bill), None
+        ).Exportar()
+        encoded_string = ""
+        with open(nombrePDF, "rb") as pdf_file:
+            encoded_string = base64.b64encode(pdf_file.read())
+
+        response = {"name": nombrePDF, "contents": encoded_string.decode("utf-8")}
+        remove(nombrePDF)
+        return jsonify(response)
+    except Exception as ex:
+            return jsonify(messages=str(ex), context=3), 500
 
 
 def get_mesure(id: int):
