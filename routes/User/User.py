@@ -81,11 +81,14 @@ def list_employees():
 def give_employee():
     email = request.json["email"]
     role = Role.query.filter_by(name="EMPLEADO").first()
+    role_admin = Role.query.filter_by(name="ADMINISTRADOR").first()
     user = Users.query.filter_by(email=email).first()
     if user == None:
         return jsonify(messages="El usuario no existe", context=2), 404
     if user.role_id == role.id:
         return jsonify(messages="El usuario ya tiene permisos", context=2), 401
+    if user.role_id == role_admin.id:
+        return jsonify(messages="Al usuario no se le pueden cambiar los permisos", context=2), 401
     user.role_id = role.id
     db.session.commit()
     return jsonify(messages="Exito asignando el rol", context=0), 200
