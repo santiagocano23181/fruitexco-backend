@@ -1,5 +1,4 @@
 import decimal
-import json
 from flask import Blueprint, jsonify, request, session
 from sqlalchemy import and_, text
 from models.Sale.Sale import Sales
