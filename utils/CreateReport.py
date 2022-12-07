@@ -1,4 +1,3 @@
-from arrow import utcnow, get
 import os
 from datetime import date
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
