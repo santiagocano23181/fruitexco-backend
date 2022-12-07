@@ -5,7 +5,7 @@ from reportlab.lib.units import inch, mm
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
-from reportlab.lib.colors import black, purple, white, green
+from reportlab.lib.colors import black, white, green
 from reportlab.pdfgen import canvas
 
 LOGO = __file__.replace('CreateReport.py', 'logo.png')
